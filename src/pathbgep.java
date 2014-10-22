@@ -1,3 +1,4 @@
+
 import java.io.*;
 import java.util.*;
 
@@ -31,11 +32,18 @@ public class pathbgep {
         }
     }
 
-    class Pair {
-        int first, second;
-        Pair (int a, int b) {
+
+    class Pair implements Comparable<Pair> {
+        long first; int second;
+        Pair (long a, int b) {
             first = a;
             second = b;
+        }
+        public int compareTo(Pair a) {
+            if (a.first != this.first)
+                return Long.compare(a.first, this.first);
+            else
+                return Integer.compare(a.second, this.second);
         }
     }
 
@@ -43,13 +51,15 @@ public class pathbgep {
     PrintWriter out;
     ArrayList<Pair>[] graph;
     long d[];
-    final long INF = Integer.MAX_VALUE;
+    final long INF = 4000000000L;
     int n;
-    Deque<Integer> queue = new ArrayDeque<Integer>();
+    boolean visited[];
+    PriorityQueue<Pair> queue = new PriorityQueue<Pair>();
 
     public void solve() throws IOException {
 
         n = in.nextInt(); int  m = in.nextInt();
+        visited = new boolean[n];
         graph = new ArrayList[n];
         for (int i = 0; i < n; i++) {
             graph[i] = new ArrayList<Pair>();
@@ -57,32 +67,34 @@ public class pathbgep {
         d = new long[n];
         for (int i = 0; i < m; i++) {
             int a = in.nextInt() - 1, b = in.nextInt() - 1, w = in.nextInt();
-            graph[a].add(new Pair(b, w));
-            graph[b].add(new Pair(a, w));
+            graph[a].add(new Pair(w, b));
+            graph[b].add(new Pair(w, a));
         }
+        //int start = in.nextInt() - 1, finish = in.nextInt() - 1;
+        int start = 0;
         Arrays.fill(d, INF);
-        levit(0);
-        for(long dest : d) {
+        extendedDijkstra(start);
+        //out.print((d[finish] != INF ? d[finish] : -1) + " ");
+        for(long dest : d)
             out.print((dest != INF ? dest : -1) + " ");
-        }
     }
 
-    void levit(int start) {
+    void extendedDijkstra(int start) {
         d[start] = 0;
-        int id[] = new int[n];
-        queue.add(start);
+        queue.add(new Pair(0, start));
 
         while(!queue.isEmpty()) {
-            int v = queue.pollFirst();
-            id[v] = 1;
+            int v = queue.peek().second; long cur = -queue.poll().first;
+            visited[v] = true;
+            if (cur > d[v])
+                continue;
+
             for (Pair u : graph[v]) {
-                if (d[u.first] > d[v] + u.second) {
-                    d[u.first] = d[v] + u.second;
-                    if (id[u.first] == 0)
-                        queue.add(u.first);
-                    else if (id[u.first] == 1)
-                        queue.addFirst(u.first);
-                    id[u.first] = 1;
+                if (d[u.second] > d[v] + u.first) {
+                    queue.remove(new Pair(-d[u.second], u.second));
+                    d[u.second] = d[v] + u.first;
+                    if (!visited[u.second])
+                        queue.add(new Pair(-d[u.second], u.second));
                 }
             }
         }

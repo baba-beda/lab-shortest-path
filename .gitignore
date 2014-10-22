@@ -2,6 +2,7 @@
 *.in
 *.out
 .idea/
+*.txt
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
