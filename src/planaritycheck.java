@@ -41,6 +41,8 @@ public class planaritycheck {
     FastScanner in;
     PrintWriter out;
     ArrayList<Integer>[] graph;
+    int color[];
+    boolean ok;
     int n;
 
     public void solve() throws IOException {
@@ -83,7 +85,7 @@ public class planaritycheck {
                 }
                 k--;
             }
-            if (homeo_k33() || homeo_k5())
+            if (homeo_k33() || homeo_k5(m))
                 out.println("NO");
             else
                 out.println("YES");
@@ -91,24 +93,52 @@ public class planaritycheck {
     }
 
     boolean homeo_k33() {
-        for (int i = 0; i < 6; i++) {
-            if (graph[i].size() < 3)
-                return false;
+        color = new int[graph.length];
+        ok = true;
+        for (int i = 0; i < color.length; i++) {
+            if (color[i] == 0) {
+                color[i] = 1;
+                dfs(i);
+            }
+        }
+        if (!ok)
+            return false;
+        Vector<Integer> second = new Vector<Integer>();
+        for (int i = 0; i < color.length; i++) {
+            if (color[i] == 2)
+                second.add(i);
+        }
+        for (int i = 0; i < color.length; i++) {
+            if (color[i] == 1)
+            {
+                for (int v : second) {
+                    if (!graph[i].contains(v))
+                        return false;
+                }
+            }
         }
         return true;
     }
 
-    boolean homeo_k5() {
-        int count = 0;
+    boolean homeo_k5(int edges) {
         for (int i = 0; i < 6; i++) {
-            if (graph[i].size() < 4 && count == 1)
-                return false;
-            if (graph[i].size() < 4)
-                count = 1;
+            if (graph[i].size() > 1 && edges - graph[i].size() + 1 == 10 || edges - graph[i].size() == 10)
+                return true;
         }
-        return true;
+        return false;
     }
 
+    void dfs(int u) {
+        for(int v : graph[u]) {
+            if (color[v] == 0) {
+                color[v] = 3 - color[u];
+                dfs(v);
+            }
+            else if (color[v] == color[u]) {
+                ok = false;
+            }
+        }
+    }
     public void run() {
         try {
             in = new FastScanner(new File("planaritycheck.in"));
