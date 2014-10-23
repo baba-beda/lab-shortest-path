@@ -117,30 +117,13 @@ public class path {
 
     void ford_bellman(int start) {
         d[start] = 0;
-        int[] p = new int[n];
-        Arrays.fill(p, -1);
         for (int i = 0; i < n; i++) {
-            x = -1;
             for (Edge edge : edges) {
                 if (d[edge.u] < INF) {
                     if (d[edge.v] > d[edge.u] + edge.weight) {
                         d[edge.v] = Math.max(-INF, d[edge.u] + edge.weight);
-                        p[edge.v] = edge.u;
-                        x = edge.v;
                     }
                 }
-            }
-        }
-        if (x != -1) {
-            int y = x;
-            for (int i = 0; i < n; i++) {
-                y = p[y];
-            }
-            cycle = new Vector<Integer>();
-            for (int cur = y; ; cur = p[cur]) {
-                cycle.add(cur);
-                if (cur == y && cycle.size() > 1)
-                    break;
             }
         }
     }
