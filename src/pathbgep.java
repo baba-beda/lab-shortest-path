@@ -54,47 +54,47 @@ public class pathbgep {
     final long INF = 4000000000L;
     int n;
     boolean visited[];
-    PriorityQueue<Pair> queue = new PriorityQueue<Pair>();
+    PriorityQueue<Long> queue = new PriorityQueue<Long>();
 
     public void solve() throws IOException {
-
-        n = in.nextInt(); int  m = in.nextInt();
-        visited = new boolean[n];
-        graph = new ArrayList[n];
-        for (int i = 0; i < n; i++) {
-            graph[i] = new ArrayList<Pair>();
-        }
-        d = new long[n];
-        for (int i = 0; i < m; i++) {
-            int a = in.nextInt() - 1, b = in.nextInt() - 1, w = in.nextInt();
-            graph[a].add(new Pair(w, b));
-            graph[b].add(new Pair(w, a));
-        }
-        //int start = in.nextInt() - 1, finish = in.nextInt() - 1;
-        int start = 0;
-        Arrays.fill(d, INF);
-        extendedDijkstra(start);
-        //out.print((d[finish] != INF ? d[finish] : -1) + " ");
-        for(long dest : d)
-            out.print((dest != INF ? dest : -1) + " ");
+            n = in.nextInt();
+            int m = in.nextInt();
+            visited = new boolean[n];
+            graph = new ArrayList[n];
+            for (int i = 0; i < n; i++) {
+                graph[i] = new ArrayList<Pair>();
+            }
+            d = new long[n];
+            for (int i = 0; i < m; i++) {
+                int a = in.nextInt() - 1, b = in.nextInt() - 1, w = in.nextInt();
+                graph[a].add(new Pair(w, b));
+                graph[b].add(new Pair(w, a));
+            }
+            //int start = in.nextInt() - 1, finish = in.nextInt() - 1;
+            int start = 0;
+            Arrays.fill(d, INF);
+            extendedDijkstra(start);
+            //out.print((d[finish] != INF ? d[finish] : -1) + " ");
+            for (long dest : d)
+                out.print((dest != INF ? dest : -1) + " ");
     }
 
     void extendedDijkstra(int start) {
         d[start] = 0;
-        queue.add(new Pair(0, start));
+        queue.add((long)start);
 
         while(!queue.isEmpty()) {
-            int v = queue.peek().second; long cur = -queue.poll().first;
+            long cur = queue.remove();
+            int v = (int) cur;
             visited[v] = true;
-            if (cur > d[v])
+            if (cur >>> 32  != d[v])
                 continue;
 
             for (Pair u : graph[v]) {
                 if (d[u.second] > d[v] + u.first) {
-                    queue.remove(new Pair(-d[u.second], u.second));
                     d[u.second] = d[v] + u.first;
                     if (!visited[u.second])
-                        queue.add(new Pair(-d[u.second], u.second));
+                        queue.add((d[u.second] << 32) + u.second);
                 }
             }
         }
