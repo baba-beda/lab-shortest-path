@@ -51,7 +51,7 @@ public class pathbgep {
     PrintWriter out;
     ArrayList<Pair>[] graph;
     long d[];
-    final long INF = 4000000000L;
+    final long INF = 300000000000L;
     int n;
     boolean visited[];
     PriorityQueue<Long> queue = new PriorityQueue<Long>();
@@ -70,13 +70,13 @@ public class pathbgep {
                 graph[a].add(new Pair(w, b));
                 graph[b].add(new Pair(w, a));
             }
-            //int start = in.nextInt() - 1, finish = in.nextInt() - 1;
-            int start = 0;
+            int start = in.nextInt() - 1, finish = in.nextInt() - 1;
+            //int start = 0;
             Arrays.fill(d, INF);
             extendedDijkstra(start);
-            //out.print((d[finish] != INF ? d[finish] : -1) + " ");
-            for (long dest : d)
-                out.print((dest != INF ? dest : -1) + " ");
+            out.print((d[finish] != INF ? d[finish] : -1) + " ");
+            //for (long dest : d)
+              //  out.print((dest != INF ? dest : -1) + " ");
     }
 
     void extendedDijkstra(int start) {
@@ -101,8 +101,8 @@ public class pathbgep {
     }
     public void run() {
         try {
-            in = new FastScanner(new File("pathbgep.in"));
-            out = new PrintWriter("pathbgep.out");
+            in = new FastScanner(new File("input.txt"));
+            out = new PrintWriter("output.txt");
 
             solve();
 
