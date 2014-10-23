@@ -69,7 +69,8 @@ public class path {
     Edge[] edges;
     int n, m;
     Vector<Integer> cycle;
-    boolean cycled[];
+    boolean fucking[];
+    boolean used[];
     int x = 1;
 
     public void solve() throws IOException {
@@ -79,7 +80,8 @@ public class path {
             int start = in.nextInt() - 1;
             edges = new Edge[m];
             graph = new ArrayList[n];
-            cycled = new boolean[n];
+            fucking = new boolean[n];
+            used = new boolean[n];
 
             for (int i = 0; i < n; i++) {
                 graph[i] = new ArrayList<Pair>();
@@ -94,18 +96,16 @@ public class path {
 
             d = new long[n];
             Arrays.fill(d, INF);
-            while (x != -1)
-                ford_bellman(start);
-            for (int i = 0; i < n; i++) {
-                if (cycled[i]) {
-                    for (Pair p : graph[i])
-                        cycled[p.first] = true;
-                }
+            bfs(start);
+            ford_bellman(start);
+            for (int i = 0; i < m; i++) {
+                if (d[edges[i].v] > d[edges[i].u] + edges[i].weight && used[edges[i].v] && !fucking[edges[i].v])
+                    dfs(edges[i].v);
             }
             for (int j = 0; j < n; j++) {
                 if (d[j] == INF)
                     out.println("*");
-                if (cycled[j])
+                if (fucking[j])
                     out.println("-");
                 else if (d[j] > -INF && d[j] < INF)
                     out.println(d[j]);
@@ -122,7 +122,7 @@ public class path {
         for (int i = 0; i < n; i++) {
             x = -1;
             for (Edge edge : edges) {
-                if (d[edge.u] < INF && !cycled[edge.u]) {
+                if (d[edge.u] < INF) {
                     if (d[edge.v] > d[edge.u] + edge.weight) {
                         d[edge.v] = Math.max(-INF, d[edge.u] + edge.weight);
                         p[edge.v] = edge.u;
@@ -139,10 +139,31 @@ public class path {
             cycle = new Vector<Integer>();
             for (int cur = y; ; cur = p[cur]) {
                 cycle.add(cur);
-                cycled[cur] = true;
                 if (cur == y && cycle.size() > 1)
                     break;
             }
+        }
+    }
+
+    void bfs(int start) {
+        Deque<Integer> queue = new ArrayDeque<Integer>();
+        queue.add(start);
+        while (!queue.isEmpty()) {
+            int u = queue.pollFirst();
+            for (Pair p : graph[u]) {
+                if (!used[p.first]) {
+                    used[p.first] = true;
+                    queue.add(p.first);
+                }
+            }
+        }
+
+    }
+    void dfs(int v) {
+        fucking[v] = true;
+        for (Pair u : graph[v]) {
+            if (!fucking[u.first])
+                dfs(u.first);
         }
     }
 
