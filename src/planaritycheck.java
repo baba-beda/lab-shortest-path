@@ -93,52 +93,51 @@ public class planaritycheck {
     }
 
     boolean homeo_k33() {
-        color = new int[graph.length];
-        ok = true;
-        for (int i = 0; i < color.length; i++) {
-            if (color[i] == 0) {
-                color[i] = 1;
-                dfs(i);
-            }
-        }
-        if (!ok)
-            return false;
-        Vector<Integer> second = new Vector<Integer>();
-        for (int i = 0; i < color.length; i++) {
-            if (color[i] == 2)
-                second.add(i);
-        }
-        for (int i = 0; i < color.length; i++) {
-            if (color[i] == 1)
-            {
-                for (int v : second) {
-                    if (!graph[i].contains(v))
-                        return false;
+        boolean flag = false;
+        for (int i = 0; i < 6 && !flag; i++) {
+            for (int j = 0; j < 6 && !flag; j++) {
+                if (j == i)
+                    continue;
+                for (int k = 0; k < 6; k++) {
+                    if (k == i || k == j)
+                        continue;
+                    int count = 0;
+                    for (int l = 0; l < 6; l++) {
+                        if (l != i && l != j && l != k && graph[i].contains(l) && graph[j].contains(l) && graph[k].contains(l))
+                            count ++;
+                    }
+                    if (count == 3) {
+                        flag = true;
+                        break;
+                    }
                 }
             }
         }
-        return true;
+        return flag;
     }
 
     boolean homeo_k5(int edges) {
         for (int i = 0; i < 6; i++) {
-            if (graph[i].size() > 1 && edges - graph[i].size() + 1 == 10 || edges - graph[i].size() == 10)
+            if (graph[i].size() <= 1 && edges - graph[i].size() == 10)
+                return true;
+            int count = 0;
+            boolean[] visited = new boolean[6];
+            if (graph[i].size() >= 2) {
+                for (int neigh : graph[i]) {
+                    for (int to : graph[neigh])
+                        if (graph[i].contains(to) && !visited[to] && to != i) {
+                            count++;
+                        }
+                    visited[neigh] = true;
+                }
+            }
+            if (graph[i].size() - count == 1 && edges - graph[i].size() + 1 == 10 && graph[i].size() > 2 || count == 0 && edges - graph[i].size() + 1 == 10 && graph[i].size() == 2 || edges - graph[i].size() == 10)
                 return true;
         }
         return false;
     }
 
-    void dfs(int u) {
-        for(int v : graph[u]) {
-            if (color[v] == 0) {
-                color[v] = 3 - color[u];
-                dfs(v);
-            }
-            else if (color[v] == color[u]) {
-                ok = false;
-            }
-        }
-    }
+
     public void run() {
         try {
             in = new FastScanner(new File("planaritycheck.in"));
